@@ -15,8 +15,8 @@
  
  */
 
-$s = "123456";
-$ret = (new Solution())->permutation($s);
+$s = "1234567890a";
+$ret = (new Solution2())->permutation($s);
 var_dump($ret);
 
 /**
@@ -24,8 +24,6 @@ var_dump($ret);
  * 如: abcd 做排列组合  第一位有4种取法a,b,c,d,第二位3种....
  * 每次从字符串中取一个字符 abcd取a, 然后其余字串bcd进入下次迭代
  *  
- * 这种方式缺点是空间复杂度很高,一次完整的组合需要用的字符串 是 abcd,bcd,cd,d 空间复杂度等差数列求和:O(n²)
- * 另外因为使用了递归,递归带来的问题同样存在,递归最大深度 n
  * 时间复杂度 O(n²)
  *
  */
@@ -58,5 +56,55 @@ class Solution {
             }
             $prefix .= $char;
         }
+    }
+}
+
+
+/**
+ * 优化版,不必记录每次的str,但由于最终要记录全结果,所以其实空间没省多少
+ * 
+ * @author zhaojian
+ *
+ */
+class Solution2 {
+    
+    /**
+     * @param String $s
+     * @return String[]
+     */
+    function permutation($s) {
+        $this->tmp = [];
+        $this->list = $s;
+        $this->len = strlen($s);
+        $this->permutationAll();
+        return $this->tmp;
+    }
+    
+    private $tmp = [];
+    private $list = '';
+    private $len = 0;
+    
+    private function permutationAll($start = 0,$current = ''){
+        if($this->len <= $start){
+            $this->tmp[] = $current;
+            return ;
+        }
+        
+        $map = [];
+        for($i = $start;$i < $this->len;$i++){
+            $char = $this->list[$i];
+            if(!isset($map[$char])) { //去重处理
+                $this->swap($start, $i);
+                $this->permutationAll($start + 1,$current.$char);
+                $map[$char] = 1;
+                $this->swap($start, $i);
+            }
+        }
+    }
+    
+    private function swap($i,$j){
+        $tmp = $this->list[$i];
+        $this->list[$i] = $this->list[$j];
+        $this->list[$j] = $tmp;
     }
 }
